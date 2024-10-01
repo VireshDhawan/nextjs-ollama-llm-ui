@@ -59,6 +59,25 @@ export default function Home() {
       console.log("Generating chat id");
       const id = uuidv4();
       setChatId(id);
+
+      // Add a system message
+      const systemMessage = {
+        id: uuidv4(),
+        type: "system",
+        content: "System: Chat initialized",
+        timestamp: new Date().toISOString(),
+      };
+
+      // Add the first message
+      const firstMessage = {
+        id: uuidv4(),
+        type: "user",
+        content: "Hello, how can I assist you today?",
+        timestamp: new Date().toISOString(),
+      };
+
+      // Update the messages state
+      setMessages([systemMessage, firstMessage]);
     }
   }, [messages]);
 
