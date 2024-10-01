@@ -54,39 +54,29 @@ export default function Home() {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (messages.length < 1) {
-      // Generate a random id for the chat
-      console.log("Generating chat id");
-      const id = uuidv4();
-      setChatId(id);
+  if (messages.length < 1) {
+    // Generate a random id for the chat
+    console.log("Generating chat id");
+    const id = uuidv4();
+    setChatId(id);
 
-      // Get system and first messages from environment variables
-      const systemMessageText =
-        process.env.NEXT_PUBLIC_SYSTEM_MESSAGE || "System: Chat initialized";
-      const firstMessageText =
-        process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
-        "Hello, how can I assist you today?";
+    // Get system and first messages from environment variables
+    const systemMessageText =
+      process.env.NEXT_PUBLIC_SYSTEM_MESSAGE || "System: Chat initialized";
+    const firstMessageText =
+      process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
+      "Hello, how can I assist you today?";
 
-      // Add a system message
-      const systemMessage = {
-        id: uuidv4(),
-        type: "system",
-        content: systemMessageText,
-        timestamp: new Date().toISOString(),
-      };
+    // Add system and first messages
+    const initialMessages = [
+      { id: uuidv4(), role: "system", content: systemMessageText },
+      { id: uuidv4(), role: "user", content: firstMessageText },
+    ];
 
-      // Add the first message
-      const firstMessage = {
-        id: uuidv4(),
-        type: "user",
-        content: firstMessageText,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Update the messages state
-      setMessages([systemMessage, firstMessage]);
-    }
-  }, [messages]);
+    // Update the messages state (using functional update)
+    setMessages(() => [...initialMessages]);
+  }
+}, [messages]);
 
   React.useEffect(() => {
     if (!isLoading && !error && chatId && messages.length > 0) {
