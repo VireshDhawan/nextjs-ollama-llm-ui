@@ -60,11 +60,18 @@ export default function Home() {
       const id = uuidv4();
       setChatId(id);
 
+      // Get system and first messages from environment variables
+      const systemMessageText =
+        process.env.NEXT_PUBLIC_SYSTEM_MESSAGE || "System: Chat initialized";
+      const firstMessageText =
+        process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
+        "Hello, how can I assist you today?";
+
       // Add a system message
       const systemMessage = {
         id: uuidv4(),
         type: "system",
-        content: "System: Chat initialized",
+        content: systemMessageText,
         timestamp: new Date().toISOString(),
       };
 
@@ -72,7 +79,7 @@ export default function Home() {
       const firstMessage = {
         id: uuidv4(),
         type: "user",
-        content: "Hello, how can I assist you today?",
+        content: firstMessageText,
         timestamp: new Date().toISOString(),
       };
 
