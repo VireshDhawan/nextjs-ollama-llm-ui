@@ -70,7 +70,7 @@ export default function Home() {
     // Add system and first messages
     const initialMessages = [
       { id: uuidv4(), role: "system", content: systemMessageText },
-      { id: uuidv4(), role: "user", content: firstMessageText },
+      { id: uuidv4(), role: "assistant", content: firstMessageText },
     ];
 
     // Update the messages state (using functional update)
