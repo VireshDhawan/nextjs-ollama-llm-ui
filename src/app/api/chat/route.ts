@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   const model = new ChatOllama({
     baseUrl: process.env.NEXT_PUBLIC_OLLAMA_URL || "http://localhost:11434",
-    //model: selectedModel,
+    model: selectedModel,
   });
 
   const parser = new BytesOutputParser();
