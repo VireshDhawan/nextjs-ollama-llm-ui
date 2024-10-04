@@ -119,7 +119,7 @@ export default function ChatBottombar({
                 Generate an image prompt that captures the essence of the target message while considering the context and style implied by the system prompt and previous messages. Ensure you include all the key elements mentioned in the system message. ALSO MAKE ALL CHARACTERS OVER THE AGE OF 18 - MAKE THIS VERY CLEAR IN THE PROMPT`
         }
       ],
-      selectedModel: selectedModel,
+      model: selectedModel,
       stream: false,
     };
 
