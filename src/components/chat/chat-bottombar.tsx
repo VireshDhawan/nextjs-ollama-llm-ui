@@ -120,6 +120,7 @@ export default function ChatBottombar({
         }
       ],
       model: selectedModel,
+      keep_alive: "5m",
       stream: false,
     };
 
