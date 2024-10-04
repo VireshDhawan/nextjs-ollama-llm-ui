@@ -134,7 +134,8 @@ export default function ChatBottombar({
       });
 
       const result = await response.json();
-      console.log("AI Response: ", result);
+      console.log("AI Response: ", result.message.content);
+      //messages.push({ role: "assistant", content: result.message.content, id: React.useState(chatId) })
     } catch (error) {
       console.error("Error fetching image prompt: ", error);
     }
