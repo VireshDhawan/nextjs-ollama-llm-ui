@@ -111,7 +111,7 @@ export default function ChatBottombar({
           role: "user",
           content: `Create a Midjourney-style image prompt based on the following:
                 General Background: "${messages[0].content}"
-                Previous Messages (for context): "${messages[messages.length - 2].content}"
+                Previous Messages (for context): "${messages.slice(0, -1).map(message => message.content)}"
 
                 Target Message - this is the current scene you should represent in the image:
                 "${messages[messages.length - 1].content}"
