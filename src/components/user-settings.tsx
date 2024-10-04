@@ -4,8 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -32,6 +30,14 @@ export default function UserSettings() {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  
+  // New States for Messages
+  const [systemMessage, setSystemMessage] = useState<string>(
+    process.env.NEXT_PUBLIC_SYSTEM_MESSAGE || ""
+  );
+  const [firstMessage, setFirstMessage] = useState<string>(
+    process.env.NEXT_PUBLIC_FIRST_MESSAGE || ""
+  );
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -105,11 +111,15 @@ export default function UserSettings() {
           <DialogContent>
             <DialogHeader className="space-y-4">
               <DialogTitle>Settings</DialogTitle>
-              <EditUsernameForm setOpen={setOpen} />
+              <EditUsernameForm
+                setOpen={setOpen}
+                systemMessage={systemMessage}
+                firstMessage={firstMessage}
+                setSystemMessage={setSystemMessage}
+                setFirstMessage={setFirstMessage}
+              />
             </DialogHeader>
           </DialogContent>
-        </Dialog>
-        <Dialog>
         </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>

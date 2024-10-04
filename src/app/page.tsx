@@ -58,29 +58,33 @@ export default function Home() {
   const setBase64Images = useChatStore((state) => state.setBase64Images);
 
   useEffect(() => {
-  if (messages.length < 1) {
-    // Generate a random id for the chat
-    console.log("Generating chat id");
-    const id = uuidv4();
-    setChatId(id);
-
-    // Get system and first messages from environment variables
-    const systemMessageText =
-      process.env.NEXT_PUBLIC_SYSTEM_MESSAGE || "System: Chat initialized";
-    const firstMessageText =
-      process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
-      "Hello, how can I assist you today?";
-
-    // Add system and first messages
-    const initialMessages = [
-      { id: uuidv4(), role: "system", content: systemMessageText },
-      { id: uuidv4(), role: "assistant", content: firstMessageText },
-    ];
-
-    // Update the messages state (using functional update)
-    setMessages(() => [...initialMessages]);
-  }
-}, [messages]);
+    if (messages.length < 1) {
+      // Generate a random id for the chat
+      console.log("Generating chat id");
+      const id = uuidv4();
+      setChatId(id);
+  
+      // Retrieve system and first messages from localStorage, falling back to environment variables
+      const systemMessageText =
+        localStorage.getItem("system_message") ||
+        process.env.NEXT_PUBLIC_SYSTEM_MESSAGE ||
+        "System: Chat initialized";
+        
+      const firstMessageText =
+        localStorage.getItem("first_message") ||
+        process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
+        "Hello, how can I assist you today?";
+  
+      // Add system and first messages
+      const initialMessages = [
+        { id: uuidv4(), role: "system", content: systemMessageText },
+        { id: uuidv4(), role: "assistant", content: firstMessageText },
+      ];
+  
+      // Update the messages state (using functional update)
+      setMessages(() => [...initialMessages]);
+    }
+  }, [messages]);
 
   React.useEffect(() => {
     if (!isLoading && !error && chatId && messages.length > 0) {
