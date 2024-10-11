@@ -26,7 +26,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   useEffect(() => {
     if (params.id) {
-      const item = localStorage.getItem(chat_${params.id});
+      const item = `localStorage.getItem(chat_${params.id})`;
       if (item) {
         setMessages(JSON.parse(item));
       }
@@ -53,7 +53,7 @@ export default function Page({ params }: { params: { id: string } }) {
       const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
         method: "POST",
         headers: {
-          "Authorization": Bearer ${process.env.NEXT_PUBLIC_API_KEY},
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -68,7 +68,7 @@ export default function Page({ params }: { params: { id: string } }) {
       const assistantMessage = data?.choices[0]?.message?.content || "No response";
 
       addMessage({ role: "assistant", content: assistantMessage, id: chatId });
-      localStorage.setItem(chat_${params.id}, JSON.stringify(messages));
+      localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
       window.dispatchEvent(new Event("storage"));
     } catch (error) {
       toast.error("An error occurred. Please try again.");
@@ -89,7 +89,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!isLoading && !error && messages.length > 0) {
-      localStorage.setItem(chat_${params.id}, JSON.stringify(messages));
+      localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
       window.dispatchEvent(new Event("storage"));
       setLoadingSubmit(false);
     }
