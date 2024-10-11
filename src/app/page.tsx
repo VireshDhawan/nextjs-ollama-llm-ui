@@ -64,6 +64,7 @@ export default function Home() {
       localStorage.setItem(`chat_${chatId}`, JSON.stringify(messages));
       window.dispatchEvent(new Event("storage"));
     }
+    setLoadingSubmit(false);
   }, [chatId, isLoading, error, messages]);
 
   const addMessage = (message: Message) => {
