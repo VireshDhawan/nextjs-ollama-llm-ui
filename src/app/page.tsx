@@ -145,7 +145,7 @@ export default function Home() {
         isLoading={isLoading}
         loadingSubmit={loadingSubmit}
         error={error}
-        stop={stop}
+        // stop={stop}
         navCollapsedSize={10}
         defaultLayout={[30, 160]}
         formRef={formRef}
