@@ -14,6 +14,9 @@ import { getSelectedModel } from "@/lib/model-helper";
 import MultiImagePicker from "../image-embedder";
 import useChatStore from "@/app/hooks/useChatStore";
 import Image from "next/image";
+import { Message, useChat } from "ai/react";
+import { v4 as uuidv4 } from "uuid";
+import { set } from "zod";
 
 export default function ChatBottombar({
   messages,
@@ -25,6 +28,7 @@ export default function ChatBottombar({
   stop,
   formRef,
   setInput,
+  setMessages
 }: ChatProps) {
   const [message, setMessage] = React.useState(input);
   const [isMobile, setIsMobile] = React.useState(false);
@@ -90,6 +94,11 @@ export default function ChatBottombar({
   }, [isLoading]);
 
   // API request to the /chat/route POST endpoint
+  const addMessage = (Message: any) => {
+    messages.push(Message);
+    window.dispatchEvent(new Event("storage"));
+    setMessages([...messages]);
+  };
   const handleImagePromptRequest = async () => {
 
     const messageData = {
@@ -133,13 +142,65 @@ export default function ChatBottombar({
         },
         body: JSON.stringify({
           model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
-          body: JSON.stringify(messageData),
+          messages: messageData.messages,
         }),
       });
 
       const result = await response.json();
-      console.log("AI Response: ", result.message.content);
+      const imagePrompt = result.choices[0].message.content;
+      console.log("AI Response: ", imagePrompt);
       //messages.push({ role: "assistant", content: result.message.content, id: React.useState(chatId) })
+     
+      // First API Call to generate the prompt
+      const promptResponse = await fetch(process.env.NEXT_PUBLIC_IMAGE_GEN_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          
+        },
+        body: JSON.stringify({
+          input: {
+            prompt: imagePrompt,  // Supplying messageData for the prompt field
+            cn_type1: "ImagePrompt",
+            cn_type2: "ImagePrompt",
+            cn_type3: "ImagePrompt",
+            cn_type4: "ImagePrompt",
+            sharpness: 2,
+            image_seed: 50403806253646856,
+            uov_method: "Disabled",
+            image_number: 1,
+            guidance_scale: 4,
+            refiner_switch: 0.5,
+            negative_prompt: "",
+            style_selections: "Fooocus V2,Fooocus Enhance,Fooocus Sharp",
+            uov_upscale_value: 0,
+            outpaint_selections: "",
+            outpaint_distance_top: 0,
+            performance_selection: "Extreme Speed",
+            outpaint_distance_left: 0,
+            aspect_ratios_selection: "1024*960",
+            outpaint_distance_right: 0,
+            outpaint_distance_bottom: 0,
+            inpaint_additional_prompt: ""
+          },
+          keep_alive: "5m",
+        }),
+      });
+    
+      if (!promptResponse.ok) {
+        throw new Error(`Failed to generate prompt: ${promptResponse.statusText}`);
+      }
+      
+      console.log(promptResponse);
+      const promptResult = await promptResponse.json();
+      console.log("Generated Prompt: ", promptResult.output[0]);
+
+        addMessage({ role: "assistant", content: promptResult.output[0], id:  uuidv4() })
+
+      // messages.push({ id: uuidv4(), role: "assistant", content:"sdhfsjkfvvcxbcvbgdfgdcvbkjsfd"});
+      
+      window.dispatchEvent(new Event("storage"));
+    
     } catch (error) {
       console.error("Error fetching image prompt: ", error);
     }

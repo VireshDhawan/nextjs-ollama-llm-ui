@@ -81,7 +81,7 @@ export default function ChatList({
     }, 1);
   };
 
-  messages.map((m) => console.log(m.experimental_attachments))
+  // messages.map((m) => console.log(m.experimental_attachments))
 
   if (messages.length === 0) {
     return (
@@ -205,10 +205,14 @@ export default function ChatList({
                       className="object-contain dark:invert"
                     />
                   </Avatar>
-                  <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
-                    {/* Check if the message content contains a code block */}
-                    {message.content.split("```").map((part, index) => {
-                      if (index % 2 === 0) {
+                <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
+                    {message.content.split("\n").map((part, index) => {
+                      // Check if the part is a base64 image string
+                      if (part.startsWith("data:image/")) {
+                        return (
+                          <img key={index} src={part} alt="Base64 image" className="max-w-full rounded-md" />
+                        );
+                      } else if (index % 2 === 0) {
                         return (
                           <Markdown key={index} remarkPlugins={[remarkGfm]}>
                             {part}
@@ -217,17 +221,16 @@ export default function ChatList({
                       } else {
                         return (
                           <pre className="whitespace-pre-wrap" key={index}>
-                            <CodeDisplayBlock code={part} lang="" />
+                            {/* <CodeDisplayBlock code={part} lang="" /> */}
                           </pre>
                         );
                       }
                     })}
-                    {isLoading &&
-                      messages.indexOf(message) === messages.length - 1 && (
-                        <span className="animate-pulse" aria-label="Typing">
-                          ...
-                        </span>
-                      )}
+                    {isLoading && messages.indexOf(message) === messages.length - 1 && (
+                      <span className="animate-pulse" aria-label="Typing">
+                        ...
+                      </span>
+                    )}
                   </span>
                 </div>
               )}
