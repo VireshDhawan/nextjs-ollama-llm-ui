@@ -196,9 +196,9 @@ export default function ChatBottombar({
         throw new Error(`Failed to generate prompt: ${promptResponse.statusText}`);
       }
       
-      console.log(promptResponse);
+      // console.log(promptResponse);
       const promptResult = await promptResponse.json();
-      console.log("Generated Prompt: ", promptResult.output[0]);
+      // console.log("Generated Prompt: ", promptResult.output[0]);
 
         addMessage({ role: "assistant", content: promptResult.output[0], id:  uuidv4() })
 
