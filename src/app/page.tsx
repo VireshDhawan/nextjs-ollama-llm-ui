@@ -76,10 +76,12 @@ export default function Home() {
   const handleAPICall = async (userMessage: string) => {
     try {
       // Prepare all messages to send, including historical messages
-      const allMessages = messages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+      const allMessages = messages
+        .filter((msg) => !msg.content.startsWith("data:image/"))
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        }));
 
       // Add the new user message
       allMessages.push({ role: "user", content: userMessage });
