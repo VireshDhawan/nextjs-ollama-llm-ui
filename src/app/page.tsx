@@ -61,9 +61,8 @@ export default function Home() {
 
   useEffect(() => {
     if (!isLoading && !error && chatId && messages.length > 0) {
-      localStorage.setItem(chat_${chatId}, JSON.stringify(messages));
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(messages));
       window.dispatchEvent(new Event("storage"));
-      
     }
     setLoadingSubmit(false);
     
@@ -72,7 +71,6 @@ export default function Home() {
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message]);
     window.dispatchEvent(new Event("storage"));
-    
   };
 
   const handleAPICall = async (userMessage: string) => {
@@ -89,7 +87,7 @@ export default function Home() {
       const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
         method: "POST",
         headers: {
-          "Authorization": Bearer ${process.env.NEXT_PUBLIC_API_KEY},
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -106,7 +104,7 @@ export default function Home() {
 
       addMessage({ role: "assistant", content: assistantMessage, id: chatId });
       setMessages((prev) => [...prev]); // Ensure state is updated
-      localStorage.setItem(chat_${chatId}, JSON.stringify(messages));
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(messages));
       window.dispatchEvent(new Event("storage"));
     } catch (error) {
       toast.error("An error occurred. Please try again.");
@@ -142,7 +140,7 @@ export default function Home() {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <ChatLayout
         chatId=""
-        setSelectedModel={() => {}}
+        setSelectedModel={process.env.NEXT_PUBLIC_SELECTED_MODEL }
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}
@@ -150,7 +148,7 @@ export default function Home() {
         isLoading={isLoading}
         loadingSubmit={loadingSubmit}
         error={error}
-        stop={stop}
+        // stop={stop}
         navCollapsedSize={10}
         defaultLayout={[30, 160]}
         formRef={formRef}
