@@ -1,186 +1,107 @@
 "use client";
 
 import { ChatLayout } from "@/components/chat/chat-layout";
-import { getSelectedModel } from "@/lib/model-helper";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
-import { BytesOutputParser } from "@langchain/core/output_parsers";
-import { Attachment, ChatRequestOptions } from "ai";
 import { Message, useChat } from "ai/react";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 import useChatStore from "../hooks/useChatStore";
+
+const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
 
 export default function Page({ params }: { params: { id: string } }) {
   const {
     messages,
     input,
     handleInputChange,
-    handleSubmit,
     isLoading,
     error,
-    stop,
     setMessages,
     setInput,
-  } = useChat({
-    onResponse: (response) => {
-      if (response) {
-        setLoadingSubmit(false);
-      }
-    },
-    onError: (error) => {
-      setLoadingSubmit(false);
-      toast.error("An error occurred. Please try again.");
-    },
-  });
+  } = useChat();
+  
   const [chatId, setChatId] = React.useState<string>("");
-  const [selectedModel, setSelectedModel] = React.useState<string>(
-    getSelectedModel()
-  );
-  const [ollama, setOllama] = React.useState<ChatOllama>();
-  const env = process.env.NODE_ENV;
-  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
 
   useEffect(() => {
-    if (env === "production") {
-      const newOllama = new ChatOllama({
-        baseUrl: process.env.NEXT_PUBLIC_OLLAMA_URL || "http://localhost:11434",
-        model: selectedModel,
-      });
-      setOllama(newOllama);
-    }
-  }, [selectedModel]);
-
-  React.useEffect(() => {
     if (params.id) {
       const item = localStorage.getItem(`chat_${params.id}`);
       if (item) {
         setMessages(JSON.parse(item));
       }
     }
-  }, []);
+  }, [params.id]);
 
-  const addMessage = (Message: any) => {
-    messages.push(Message);
+  const addMessage = (message: Message) => {
+    setMessages((prev) => [...prev, message]);
     window.dispatchEvent(new Event("storage"));
-    setMessages([...messages]);
   };
 
-  // Function to handle chatting with Ollama in production (client side)
-  const handleSubmitProduction = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
+  const handleAPICall = async (userMessage: string) => {
+    try {
+      const allMessages = messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
 
-    addMessage({ role: "user", content: input, id: chatId });
-    setInput("");
+      // Add the user's latest message to the conversation
+      allMessages.push({ role: "user", content: userMessage });
 
-    if (ollama) {
-      try {
-        const parser = new BytesOutputParser();
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
+          messages: allMessages,
+        }),
+      });
 
-        const stream = await ollama
-          .pipe(parser)
-          .stream(
-            (messages as Message[]).map((m) =>
-              m.role == "user"
-                ? new HumanMessage(m.content)
-                : new AIMessage(m.content)
-            )
-          );
+      if (!response.ok) throw new Error("Network response was not ok");
 
-        const decoder = new TextDecoder();
+      const data = await response.json();
+      const assistantMessage = data?.choices[0]?.message?.content || "No response";
 
-        let responseMessage = "";
-        for await (const chunk of stream) {
-          const decodedChunk = decoder.decode(chunk);
-          responseMessage += decodedChunk;
-          setLoadingSubmit(false);
-          setMessages([
-            ...messages,
-            { role: "assistant", content: responseMessage, id: chatId },
-          ]);
-        }
-        addMessage({ role: "assistant", content: responseMessage, id: chatId });
-        setMessages([...messages]);
-
-        localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
-        // Trigger the storage event to update the sidebar component
-        window.dispatchEvent(new Event("storage"));
-      } catch (error) {
-        toast.error("An error occurred. Please try again.");
-        setLoadingSubmit(false);
-      }
+      addMessage({ role: "assistant", content: assistantMessage, id: chatId });
+      localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
+      window.dispatchEvent(new Event("storage"));
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
     }
   };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoadingSubmit(true);
+    
+    if (!input) return;
 
-    setMessages([...messages]);
+    addMessage({ role: "user", content: input, id: chatId });
+    setInput("");
 
-    const attachments: Attachment[] = base64Images
-    ? base64Images.map((image) => ({
-        contentType: 'image/base64', // Content type for base64 images
-        url: image, // The base64 image data
-      }))
-    : [];
-
-    // Prepare the options object with additional body data, to pass the model.
-    const requestOptions: ChatRequestOptions = {
-      options: {
-        body: {
-          selectedModel: selectedModel,
-        },
-      },
-      ...(base64Images && {
-        data: {
-          images: base64Images,
-        },
-        experimental_attachments: attachments
-      }),
-    };
-
-    if (env === "production" && selectedModel !== "REST API") {
-      handleSubmitProduction(e);
-      setBase64Images(null)
-    } else {
-      // use the /api/chat route
-      // Call the handleSubmit function with the options
-      handleSubmit(e, requestOptions);
-      setBase64Images(null)
-    }
+    handleAPICall(input);
+    setBase64Images(null);
   };
 
-  // When starting a new chat, append the messages to the local storage
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isLoading && !error && messages.length > 0) {
       localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));
-      // Trigger the storage event to update the sidebar component
       window.dispatchEvent(new Event("storage"));
     }
-  }, [messages, chatId, isLoading, error]);
+  }, [messages, params.id, isLoading, error]);
 
   return (
     <main className="flex h-[calc(100dvh)] flex-col items-center">
       <ChatLayout
         chatId={params.id}
-        setSelectedModel={setSelectedModel}
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={onSubmit}
         isLoading={isLoading}
-        loadingSubmit={loadingSubmit}
         error={error}
-        stop={stop}
-        navCollapsedSize={10}
-        defaultLayout={[30, 160]}
         formRef={formRef}
         setMessages={setMessages}
         setInput={setInput}

@@ -125,12 +125,16 @@ export default function ChatBottombar({
     };
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_OLLAMA_URL+'/api/chat', {
-        method: 'POST',
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(messageData),
+        body: JSON.stringify({
+          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
+          body: JSON.stringify(messageData),
+        }),
       });
 
       const result = await response.json();
