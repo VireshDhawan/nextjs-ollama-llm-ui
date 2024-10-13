@@ -139,7 +139,7 @@ export default function ChatBottombar({
     };
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
+      const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
@@ -157,7 +157,7 @@ export default function ChatBottombar({
       //messages.push({ role: "assistant", content: result.message.content, id: React.useState(chatId) })
      
       // First API Call to generate the prompt
-      const promptResponse = await fetch(process.env.NEXT_PUBLIC_IMAGE_GEN_URL, {
+      const promptResponse = await fetch(process.env.NEXT_PUBLIC_IMAGE_URL, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

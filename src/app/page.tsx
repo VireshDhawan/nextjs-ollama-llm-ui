@@ -86,7 +86,7 @@ export default function Home() {
       // Add the new user message
       allMessages.push({ role: "user", content: userMessage });
 
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL+'/api/v1/chat/completions', {
+      const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
