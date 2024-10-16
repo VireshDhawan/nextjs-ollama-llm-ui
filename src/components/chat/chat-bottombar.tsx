@@ -92,6 +92,7 @@ export default function ChatBottombar({
       stopVoiceInput();
     }
   }, [isLoading]);
+  const apiHeaders = JSON.parse(process.env.NEXT_PUBLIC_API_HEADERS || '');
 
   // API request to the /chat/route POST endpoint
   const addMessage = (Message: any) => {
@@ -144,6 +145,7 @@ export default function ChatBottombar({
         headers: {
           //"Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
+          ...apiHeaders,
         },
         body: JSON.stringify({
           //model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
@@ -162,7 +164,7 @@ export default function ChatBottombar({
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          
+          ...apiHeaders,
         },
         body: JSON.stringify({
           input: {
