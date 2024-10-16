@@ -89,11 +89,11 @@ export default function Home() {
       const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+          //"Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
+          //model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
           messages: allMessages,
         }),
       });
