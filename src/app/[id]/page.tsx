@@ -50,17 +50,17 @@ export default function Page({ params }: { params: { id: string } }) {
       // Add the user's latest message to the conversation
       allMessages.push({ role: "user", content: userMessage });
 
-      const apiHeaders = JSON.parse(process.env.NEXT_PUBLIC_API_HEADERS || '');
+      // const apiHeaders = JSON.parse(process.env.NEXT_PUBLIC_API_HEADERS || '');
 
       const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
         method: "POST",
         headers: {
-          //"Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
-          ...apiHeaders,
+          // ...apiHeaders,
         },
         body: JSON.stringify({
-          //model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
+          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
           messages: allMessages,
         }),
       });
