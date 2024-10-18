@@ -50,25 +50,23 @@ export default function Page({ params }: { params: { id: string } }) {
       // Add the user's latest message to the conversation
       allMessages.push({ role: "user", content: userMessage });
 
-      // const apiHeaders = JSON.parse(process.env.NEXT_PUBLIC_API_HEADERS || '');
-
-      const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
+      const response = await fetch('/api/proxy', {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
-          // ...apiHeaders,
         },
         body: JSON.stringify({
-          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
-          messages: allMessages,
+          endpoint: 'chat',  // Pass the endpoint information
+          messages: allMessages,  // Your other data (in case of chat),
+          stream: false
         }),
       });
 
       if (!response.ok) throw new Error("Network response was not ok");
 
       const data = await response.json();
-      const assistantMessage = data?.choices[0]?.message?.content || "No response";
+      // const assistantMessage = data?.choices[0]?.message?.content || "No response";
+      const assistantMessage = data?.content || "No response";
 
       addMessage({ role: "assistant", content: assistantMessage, id: chatId });
       localStorage.setItem(`chat_${params.id}`, JSON.stringify(messages));

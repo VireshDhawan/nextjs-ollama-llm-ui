@@ -140,58 +140,34 @@ export default function ChatBottombar({
     };
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_CHAT_URL, {
+      const response = await fetch('/api/proxy', {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
           "Content-Type": "application/json",
-          // ...apiHeaders,
         },
         body: JSON.stringify({
-          model: process.env.NEXT_PUBLIC_SELECTED_MODEL,
+          endpoint: 'chat',
           messages: messageData.messages,
+          stream: false
         }),
       });
 
       const result = await response.json();
-      const imagePrompt = result.choices[0].message.content;
+      // const imagePrompt = result.choices[0].message.content;
+      const imagePrompt = result.content;
       // const imagePrompt = result.content;
       console.log("AI Response: ", imagePrompt);
       //messages.push({ role: "assistant", content: result.message.content, id: React.useState(chatId) })
      
       // First API Call to generate the prompt
-      const promptResponse = await fetch(process.env.NEXT_PUBLIC_IMAGE_URL, {
-        method: 'POST',
+      const promptResponse = await fetch('/api/proxy', {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // ...apiHeaders,
         },
         body: JSON.stringify({
-          input: {
-            prompt: imagePrompt,  // Supplying messageData for the prompt field
-            cn_type1: "ImagePrompt",
-            cn_type2: "ImagePrompt",
-            cn_type3: "ImagePrompt",
-            cn_type4: "ImagePrompt",
-            sharpness: 2,
-            image_seed: 50403806253646856,
-            uov_method: "Disabled",
-            image_number: 1,
-            guidance_scale: 4,
-            refiner_switch: 0.5,
-            negative_prompt: "",
-            style_selections: "Fooocus V2,Fooocus Enhance,Fooocus Sharp",
-            uov_upscale_value: 0,
-            outpaint_selections: "",
-            outpaint_distance_top: 0,
-            performance_selection: "Extreme Speed",
-            outpaint_distance_left: 0,
-            aspect_ratios_selection: "1024*960",
-            outpaint_distance_right: 0,
-            outpaint_distance_bottom: 0,
-            inpaint_additional_prompt: ""
-          },
-          keep_alive: "5m",
+          endpoint: 'image',
+          prompt: imagePrompt,
         }),
       });
     
@@ -203,7 +179,7 @@ export default function ChatBottombar({
       const promptResult = await promptResponse.json();
       // console.log("Generated Prompt: ", promptResult.output[0]);
 
-        addMessage({ role: "assistant", content: promptResult.output[0], id:  uuidv4() })
+        addMessage({ role: "assistant", content: promptResult.image_url, id:  uuidv4() })
 
       // messages.push({ id: uuidv4(), role: "assistant", content:"sdhfsjkfvvcxbcvbgdfgdcvbkjsfd"});
       

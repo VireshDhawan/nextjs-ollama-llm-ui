@@ -208,7 +208,8 @@ export default function ChatList({
                 <span className="bg-accent p-3 rounded-md max-w-xs sm:max-w-2xl overflow-x-auto">
                     {message.content.split("\n").map((part, index) => {
                       // Check if the part is a base64 image string
-                      if (part.startsWith("data:image/")) {
+                      // if (part.startsWith("data:image/")) {
+                        if (part.startsWith("https://")) {
                         return (
                           <img key={index} src={part} alt="Base64 image" className="max-w-full rounded-md" />
                         );
