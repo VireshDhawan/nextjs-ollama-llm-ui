@@ -148,6 +148,7 @@ export default function ChatBottombar({
         body: JSON.stringify({
           endpoint: 'chat',
           messages: messageData.messages,
+          keep_alive: "5m",
           stream: false
         }),
       });

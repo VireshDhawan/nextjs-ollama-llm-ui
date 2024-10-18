@@ -58,6 +58,7 @@ export default function Page({ params }: { params: { id: string } }) {
         body: JSON.stringify({
           endpoint: 'chat',  // Pass the endpoint information
           messages: allMessages,  // Your other data (in case of chat),
+          keep_alive: "5m",
           stream: false
         }),
       });
