@@ -10,5 +10,5 @@ export function getSelectedModel(): string {
   if (envModel) return envModel;
 
   // Fallback to the default model
-  return 'gemma:2b';
+  return 'Heather';
 }

@@ -45,9 +45,13 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
     // Fetching values from localStorage
     const savedName = localStorage.getItem("ollama_user") || "Anonymous";
     const savedSystemMessage =
-      localStorage.getItem("system_message") || "System: Chat initialized";
+        localStorage.getItem("system_message") ||
+        process.env.NEXT_PUBLIC_SYSTEM_MESSAGE ||
+        "System: Chat initialized";
     const savedFirstMessage =
-      localStorage.getItem("first_message") || "Hello, how can I assist you today?";
+        localStorage.getItem("first_message") ||
+        process.env.NEXT_PUBLIC_FIRST_MESSAGE ||
+        "Hello, how can I assist you today?";
 
     // Setting the values in state
     setName(savedName);

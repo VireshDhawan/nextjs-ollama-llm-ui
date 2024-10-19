@@ -13,6 +13,12 @@
 </div>
 
 
+To run using docker:
+```
+sudo docker build -t my-nextjs-app .
+sudo docker run -d -p 80:80 my-nextjs-app
+```
+
 Get up and running with Large Language Models **quickly**, **locally** and even **offline**.
 This project aims to be the easiest way for you to get started with LLMs. No tedious and annoying setup required!
 

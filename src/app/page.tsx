@@ -9,13 +9,12 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import UsernameForm from "@/components/username-form";
+import { getSelectedModel } from "@/lib/model-helper";
 import { Message, useChat } from "ai/react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import useChatStore from "./hooks/useChatStore";
-
-const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
 
 export default function Home() {
   const {
@@ -24,6 +23,7 @@ export default function Home() {
     handleInputChange,
     isLoading,
     error,
+    stop,
     setMessages,
     setInput,
   } = useChat();
@@ -86,7 +86,7 @@ export default function Home() {
       // Add the new user message
       allMessages.push({ role: "user", content: userMessage });
 
-      const response = await fetch('/api/proxy', {
+      const response = await fetch('/api/backpro', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ export default function Home() {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <ChatLayout
         chatId=""
-        setSelectedModel={process.env.NEXT_PUBLIC_SELECTED_MODEL }
+        setSelectedModel={ getSelectedModel }
         messages={messages}
         input={input}
         handleInputChange={handleInputChange}
@@ -151,7 +151,7 @@ export default function Home() {
         isLoading={isLoading}
         loadingSubmit={loadingSubmit}
         error={error}
-        // stop={stop}
+        stop={stop}
         navCollapsedSize={10}
         defaultLayout={[30, 160]}
         formRef={formRef}

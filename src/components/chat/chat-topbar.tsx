@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect } from "react";
 import {
   Popover,
@@ -9,9 +7,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -20,6 +15,7 @@ import { CaretSortIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Sidebar } from "../sidebar";
 import { Message } from "ai/react";
 import { getSelectedModel } from "@/lib/model-helper";
+import { models } from './models'; // Adjust the path according to your structure
 
 interface ChatTopbarProps {
   setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
@@ -36,48 +32,33 @@ export default function ChatTopbar({
   messages,
   setMessages
 }: ChatTopbarProps) {
-  const [models, setModels] = React.useState<string[]>([]);
+  const [currentModel, setCurrentModel] = React.useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [currentModel, setCurrentModel] = React.useState<string | null>(null);
 
   useEffect(() => {
+    // Set the current model (if any)
     setCurrentModel(getSelectedModel());
-
-    const env = process.env.NODE_ENV;
-
-    const fetchModels = async () => {
-      if (env === "production") {
-        const fetchedModels = await fetch(process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags");
-        const json = await fetchedModels.json();
-        const apiModels = json.models.map((model : any) => model.name);
-        setModels([...apiModels]);
-      } 
-      else {
-        const fetchedModels = await fetch("/api/tags") 
-        const json = await fetchedModels.json();
-        const apiModels = json.models.map((model : any) => model.name);
-        setModels([...apiModels]);
-    }
-    }
-    fetchModels();
   }, []);
 
-  const handleModelChange = (model: string) => {
-    setCurrentModel(model);
-    setSelectedModel(model);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem("selectedModel", model);
+  const handleModelChange = (modelName: string) => {
+    const selectedModel = models.find((model) => model.name === modelName);
+
+    if (selectedModel) {
+      setCurrentModel(modelName);
+      setSelectedModel(modelName);
+
+      // Update localStorage with system_message and first_message
+      localStorage.setItem("system_message", selectedModel.system_message);
+      localStorage.setItem("first_message", selectedModel.first_message);
+      localStorage.setItem("selectedModel", modelName);
     }
+
     setOpen(false);
   };
 
-  const handleCloseSidebar = () => {
-    setSheetOpen(false);  // Close the sidebar
-  };
-
   return (
-    <div className="w-full flex px-4 py-6  items-center justify-between lg:justify-center ">
+    <div className="w-full flex px-4 py-6 items-center justify-between lg:justify-center ">
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger>
           <HamburgerMenuIcon className="lg:hidden w-5 h-5" />
@@ -89,7 +70,7 @@ export default function ChatTopbar({
             isMobile={false}
             messages={messages}
             setMessages={setMessages}
-            closeSidebar={handleCloseSidebar} 
+            closeSidebar={() => setSheetOpen(false)} 
           />
         </SheetContent>
       </Sheet>
@@ -111,18 +92,16 @@ export default function ChatTopbar({
           {models.length > 0 ? (
             models.map((model) => (
               <Button
-                key={model}
+                key={model.name}
                 variant="ghost"
                 className="w-full"
-                onClick={() => {
-                  handleModelChange(model);
-                }}
+                onClick={() => handleModelChange(model.name)}
               >
-                {model}
+                {model.name}
               </Button>
             ))
           ) : (
-            <Button variant="ghost" disabled className=" w-full">
+            <Button variant="ghost" disabled className="w-full">
               No models available
             </Button>
           )}

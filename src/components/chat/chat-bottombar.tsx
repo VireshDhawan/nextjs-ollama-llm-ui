@@ -140,7 +140,7 @@ export default function ChatBottombar({
     };
 
     try {
-      const response = await fetch('/api/proxy', {
+      const response = await fetch('/api/backpro', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -161,7 +161,7 @@ export default function ChatBottombar({
       //messages.push({ role: "assistant", content: result.message.content, id: React.useState(chatId) })
      
       // First API Call to generate the prompt
-      const promptResponse = await fetch('/api/proxy', {
+      const promptResponse = await fetch('/api/backpro', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -50,7 +50,7 @@ export default function Page({ params }: { params: { id: string } }) {
       // Add the user's latest message to the conversation
       allMessages.push({ role: "user", content: userMessage });
 
-      const response = await fetch('/api/proxy', {
+      const response = await fetch('/api/backpro', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
