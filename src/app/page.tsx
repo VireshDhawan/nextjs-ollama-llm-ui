@@ -77,7 +77,7 @@ export default function Home() {
     try {
       // Prepare all messages to send, including historical messages
       const allMessages = messages
-        .filter((msg) => !msg.content.startsWith("data:image/"))
+        .filter((msg) => !msg.content.startsWith("https://"))
         .map((msg) => ({
           role: msg.role,
           content: msg.content,

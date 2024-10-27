@@ -105,7 +105,7 @@ export default function ChatBottombar({
     const previousMessages = messages
       .slice(0, -1)
       .map(message => message.content)
-      .filter(content => !content.startsWith("data:image/"));
+      .filter(content => !content.startsWith("https://"));
 
     const messageData = {
       messages: [
